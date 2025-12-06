@@ -83,4 +83,12 @@ public class EmployeeController {
         log.info("分页查询：{}",employeePageQueryDTO);
         return Result.success(employeeService.page(employeePageQueryDTO));
     }
+
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        log.info("员工状态：{}",status);
+        log.info("员工id：{}",id);
+        employeeService.startOrStop(status,id);
+        return Result.success();
+    }
 }

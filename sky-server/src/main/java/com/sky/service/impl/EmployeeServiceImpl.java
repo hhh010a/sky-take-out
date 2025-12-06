@@ -125,6 +125,10 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return new PageResult(result.getTotal(), result.getRecords());
     }
 
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        this.lambdaUpdate().eq(Employee::getId, id).set(Employee::getStatus, status).update();
+    }
 
 
 }
