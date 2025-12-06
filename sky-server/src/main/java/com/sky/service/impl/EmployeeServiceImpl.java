@@ -130,5 +130,21 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         this.lambdaUpdate().eq(Employee::getId, id).set(Employee::getStatus, status).update();
     }
 
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = this.lambdaQuery().eq(Employee::getId, id).one();
+        employee.setPassword("******");
+        return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = BeanUtil.toBean(employeeDTO, Employee.class);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        this.updateById(employee);
+    }
+
+
 
 }
