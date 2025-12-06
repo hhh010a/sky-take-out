@@ -1,6 +1,8 @@
 package com.sky.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
@@ -8,14 +10,15 @@ import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -80,6 +83,48 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
 
         save(employee);
     }
+
+//    @Override
+//    public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
+//        // 创建分页对象
+//        Page<Employee> page = new Page<>(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+//
+//        // 构造查询条件
+//        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+//
+//        // 动态条件查询
+//        if (employeePageQueryDTO.getName() != null && !employeePageQueryDTO.getName().isEmpty()) {
+//            queryWrapper.like(Employee::getName, employeePageQueryDTO.getName());
+//        }
+//
+//        // 按创建时间降序排列
+//        queryWrapper.orderByDesc(Employee::getCreateTime);
+//
+//        // 执行分页查询
+//        page = this.page(page, queryWrapper);
+//
+//        // 返回结果
+//        return new PageResult(page.getTotal(), page.getRecords());
+//    }
+
+    @Override
+    public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
+        // 使用 lambdaQuery 构造分页查询
+        Page<Employee> page = new Page<>(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+
+        Page<Employee> result = this.lambdaQuery()
+                // 动态条件查询
+                .like(employeePageQueryDTO.getName() != null && !employeePageQueryDTO.getName().isEmpty(),
+                        Employee::getName, employeePageQueryDTO.getName())
+                // 按创建时间降序排列
+                .orderByDesc(Employee::getCreateTime)
+                // 执行分页查询
+                .page(page);
+
+        // 返回结果
+        return new PageResult(result.getTotal(), result.getRecords());
+    }
+
 
 
 }
