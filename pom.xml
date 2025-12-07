@@ -31,6 +31,7 @@
         <jaxb-api>2.3.1</jaxb-api>
         <poi>3.16</poi>
         <hutool>5.8.37</hutool>
+        <jsqlparser>4.5</jsqlparser>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -38,6 +39,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser}</version>
             </dependency>
 
             <dependency>
