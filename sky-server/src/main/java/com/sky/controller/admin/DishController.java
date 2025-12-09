@@ -5,9 +5,12 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -27,5 +30,24 @@ public class DishController {
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("分页查询：{}",dishPageQueryDTO);
         return Result.success(dishService.page(dishPageQueryDTO));
+    }
+
+    @DeleteMapping
+    public Result deleteByIds(@RequestParam List<Long> ids){
+        log.info("批量删除：{}",ids);
+        dishService.deleteByIds(ids);
+        return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    public Result<DishVO> getById(@PathVariable Long id){
+        return Result.success(dishService.getByIdWithFlavor(id));
+    }
+
+    @PutMapping
+    public Result update(@RequestBody DishDTO dishDTO){
+        log.info("编辑菜品：{}",dishDTO);
+        dishService.updateWithFlavor(dishDTO);
+        return Result.success();
     }
 }
