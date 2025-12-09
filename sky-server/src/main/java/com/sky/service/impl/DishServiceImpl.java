@@ -9,13 +9,12 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
-import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
-import com.sky.service.SetmealDishService;
 import com.sky.vo.DishVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +31,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     private final DishFlavorServiceImpl dishFlavorService;
     private final SetmealDishMapper setmealDishMapper;
+    private final SetmealServiceImpl setmealService;
     @Override
     @Transactional
     public void saveWithFlavor(DishDTO dishDTO) {
@@ -84,6 +85,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @Transactional
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish= BeanUtil.toBean(dishDTO,Dish.class);
         updateById(dish);
@@ -96,4 +98,29 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             dishFlavorService.saveBatch(flavors);
         }
     }
+
+    @Override
+    @Transactional
+    public void startOrStop(Integer status, Long id) {
+        lambdaUpdate().eq(Dish::getId,id).set(Dish::getStatus,status).update();
+
+        if(status== StatusConstant.DISABLE){
+            List<Long> ids=new ArrayList<>();
+            ids.add(id);
+            List<Long> setmealIds=setmealDishMapper.getSetmealIdsByDishIds(ids);
+            if(setmealIds!=null&&setmealIds.size()>0){
+                for(Long setmealId:setmealIds){
+                    Setmeal setmeal=Setmeal.builder().id(setmealId).status(StatusConstant.DISABLE).build();
+                    setmealService.updateById(setmeal);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        return lambdaQuery().eq(Dish::getCategoryId,categoryId).list();
+    }
+
+
 }

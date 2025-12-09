@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
 
@@ -23,4 +25,6 @@ public interface DishMapper extends BaseMapper<Dish> {
 
     Page<DishVO> pageQuery(@Param("page") Page<DishVO> page,@Param("dishPageQueryDTO") DishPageQueryDTO dishPageQueryDTO);
 
+    @Select("select d.* from dish d left join setmeal_dish s on d.id=s.dish_id where s.setmeal_id =#{setmealId}")
+    List<Dish> dishList(Long setmealId);
 }
