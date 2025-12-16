@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +67,15 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             shoppingCart.setCreateTime(LocalDateTime.now());
             save(shoppingCart);
         }
+    }
+
+    @Override
+    public List<ShoppingCart> shoppingCartlist() {
+        return lambdaQuery().eq(ShoppingCart::getUserId,BaseContext.getCurrentId()).list();
+    }
+
+    @Override
+    public void clean() {
+        lambdaUpdate().eq(ShoppingCart::getUserId,BaseContext.getCurrentId()).remove();
     }
 }
