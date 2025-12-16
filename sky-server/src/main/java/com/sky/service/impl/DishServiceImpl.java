@@ -11,12 +11,14 @@ import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     private final DishFlavorServiceImpl dishFlavorService;
     private final SetmealDishMapper setmealDishMapper;
     private final SetmealServiceImpl setmealService;
+    private final DishMapper dishMapper;
     @Override
     @Transactional
     public void saveWithFlavor(DishDTO dishDTO) {
@@ -123,4 +126,24 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
 
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorService.lambdaQuery()
+                    .eq(DishFlavor::getDishId, d.getId())
+                    .list();
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
 }

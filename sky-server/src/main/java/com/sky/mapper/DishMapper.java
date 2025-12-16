@@ -27,4 +27,6 @@ public interface DishMapper extends BaseMapper<Dish> {
 
     @Select("select d.* from dish d left join setmeal_dish s on d.id=s.dish_id where s.setmeal_id =#{setmealId}")
     List<Dish> dishList(Long setmealId);
+
+    List<Dish> list(Dish dish);
 }

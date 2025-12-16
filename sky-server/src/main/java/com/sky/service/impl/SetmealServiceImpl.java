@@ -16,6 +16,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     private final SetmealDishServiceImpl setmealDishService;
     private final DishMapper dishMapper;
+    private final SetmealMapper setmealMapper;
     @Override
     public void saveWithSetmealDishes(SetmealDTO setmealDTO) {
         Setmeal setmeal= BeanUtil.toBean(setmealDTO,Setmeal.class);
@@ -99,4 +101,19 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         }
         lambdaUpdate().eq(Setmeal::getId,id).set(Setmeal::getStatus,status).update();
     }
+
+    public List<Setmeal> list(Setmeal setmeal) {
+        List<Setmeal> list = setmealMapper.list(setmeal);
+        return list;
+    }
+
+    /**
+     * 根据id查询菜品选项
+     * @param id
+     * @return
+     */
+    public List<DishItemVO> getDishItemById(Long id) {
+        return setmealMapper.getDishItemBySetmealId(id);
+    }
+
 }
